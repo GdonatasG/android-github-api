@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="com.android.android_github_api.utils.Status" />
+
+        <variable
+            name="fragment"
+            type="com.android.android_github_api.ui.main.view.SearchFragment" />
+
+        <variable
+            name="viewModel"
+            type="com.android.android_github_api.ui.main.viewmodel.SearchViewModel" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="ui.main.view.SearchFragment">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_input_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/et_query"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter text query"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLines="1" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/et_github_user"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:hint="Enter GithubUser"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:maxLines="1" />
+
+                <Button
+                    android:id="@+id/btn_github_user_submit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Change Github account" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <TextView
+            android:id="@+id/tv_search_repos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ll_input_filters"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Search repos"
+            android:visibility="@{viewModel.githubSearchData.peekContent().status == Status.EMPTY ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ll_input_filters"
+            android:gravity="center"
+            android:visibility="@{viewModel.githubSearchData.peekContent().status == Status.LOADING &amp;&amp; viewModel.githubSearchData.peekContent().data == null ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                app:indicatorColor="@color/purple_500" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_repos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ll_input_filters"
+            android:visibility="@{viewModel.githubSearchData.peekContent().data.items.size > 0 ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_nothing_found"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ll_input_filters"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Nothing found :("
+            android:visibility="@{viewModel.githubSearchData.peekContent().status == Status.SUCCESS &amp;&amp; viewModel.githubSearchData.peekContent().data.items.size == 0 ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/ll_main_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ll_input_filters"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.githubSearchData.peekContent().status == Status.ERROR &amp;&amp; viewModel.githubSearchData.peekContent().data == null ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Error, try again!" />
+
+            <Button
+                android:id="@+id/btn_main_retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{fragment.mainRetry}"
+                android:text="Retry" />
+
+        </LinearLayout>
+    </RelativeLayout>
+</layout>
